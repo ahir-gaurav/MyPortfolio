@@ -1,5 +1,7 @@
 import * as THREE from "three";
 import { useRef, useMemo, useState, useEffect } from "react";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ScrollSmoother } from "gsap/ScrollSmoother";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Environment } from "@react-three/drei";
 import { EffectComposer, N8AO } from "@react-three/postprocessing";
@@ -128,27 +130,31 @@ const TechStack = () => {
   const [isActive, setIsActive] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      const scrollY = window.scrollY || document.documentElement.scrollTop;
-      const threshold = document
-        .getElementById("work")!
-        .getBoundingClientRect().top;
-      setIsActive(scrollY > threshold);
-    };
-    document.querySelectorAll(".header a").forEach((elem) => {
-      const element = elem as HTMLAnchorElement;
-      element.addEventListener("click", () => {
-        const interval = setInterval(() => {
-          handleScroll();
-        }, 10);
-        setTimeout(() => {
-          clearInterval(interval);
-        }, 1000);
-      });
-    });
-    window.addEventListener("scroll", handleScroll);
+    ScrollTrigger.refresh();
+    const smoother = ScrollSmoother.get();
+    if (smoother) {
+      smoother.refresh();
+      smoother.paused(false);
+    }
+
+    const el = document.querySelector(".techstack");
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsActive(entry.isIntersecting);
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(el);
+
+    const safetyTimeout = setTimeout(() => {
+      ScrollTrigger.refresh();
+      ScrollSmoother.get()?.refresh();
+    }, 500);
+
     return () => {
-      window.removeEventListener("scroll", handleScroll);
+      observer.disconnect();
+      clearTimeout(safetyTimeout);
     };
   }, []);
   const materials = useMemo(() => {

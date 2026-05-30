@@ -2,6 +2,7 @@ import "./styles/Work.css";
 import WorkImage from "./WorkImage";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
+import { ScrollSmoother } from "gsap/ScrollSmoother";
 import { useGSAP } from "@gsap/react";
 
 // Import images so Vite can bundle them correctly for production
@@ -49,41 +50,85 @@ const projects = [
 
 const Work = () => {
   useGSAP(() => {
-    let translateX: number = 0;
+    let timeline: gsap.core.Timeline | null = null;
+    let checkInterval: any = null;
+    let safetyTimeout: any = null;
 
-    function setTranslateX() {
-      const box = document.getElementsByClassName("work-box");
-      if (!box.length) return;
-      const rectLeft = document
-        .querySelector(".work-container")!
-        .getBoundingClientRect().left;
-      const rect = box[0].getBoundingClientRect();
-      const parentWidth = box[0].parentElement!.getBoundingClientRect().width;
-      let padding: number =
-        parseInt(window.getComputedStyle(box[0]).padding) / 2;
-      translateX = rect.width * box.length - (rectLeft + parentWidth) + padding;
+    function initTrigger() {
+      let translateX: number = 0;
+
+      function setTranslateX() {
+        const flexEl = document.querySelector(".work-flex") as HTMLElement;
+        if (!flexEl) return;
+        const boxes = flexEl.querySelectorAll(".work-box");
+        if (boxes.length === 0) {
+          translateX = flexEl.scrollWidth - flexEl.clientWidth;
+          return;
+        }
+        const firstBox = boxes[0] as HTMLElement;
+        const lastBox = boxes[boxes.length - 1] as HTMLElement;
+        const boxesWidth = lastBox.offsetLeft + lastBox.offsetWidth - firstBox.offsetLeft;
+        const style = window.getComputedStyle(flexEl);
+        const paddingRight = parseFloat(style.paddingRight) || 0;
+        const paddingLeft = parseFloat(style.paddingLeft) || 0;
+        translateX = Math.max(0, (boxesWidth + paddingRight + paddingLeft) - flexEl.clientWidth);
+      }
+
+      setTranslateX();
+
+      timeline = gsap.timeline({
+        scrollTrigger: {
+          trigger: ".work-section",
+          start: "top top",
+          end: () => {
+            setTranslateX();
+            return `+=${translateX}`;
+          },
+          scrub: true,
+          pin: true,
+          id: "work",
+          invalidateOnRefresh: true,
+        },
+      });
+
+      timeline.to(".work-flex", {
+        x: () => -translateX,
+        ease: "none",
+      });
+
+      ScrollTrigger.refresh();
     }
 
-    setTranslateX();
+    if (ScrollSmoother.get()) {
+      initTrigger();
+    } else {
+      checkInterval = setInterval(() => {
+        if (ScrollSmoother.get()) {
+          clearInterval(checkInterval);
+          initTrigger();
+        }
+      }, 30);
 
-    const timeline = gsap.timeline({
-      scrollTrigger: {
-        trigger: ".work-section",
-        start: "top top",
-        end: `+=${translateX}`,
-        scrub: true,
-        pin: true,
-        id: "work",
-      },
-    });
+      safetyTimeout = setTimeout(() => {
+        clearInterval(checkInterval);
+        if (!timeline) {
+          initTrigger();
+        }
+      }, 600);
+    }
 
-    timeline.to(".work-flex", {
-      x: -translateX,
-      ease: "none",
-    });
+    // Delayed refresh to account for layout height updates after the loader fades out
+    const timeoutId = setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 3500);
 
     return () => {
-      timeline.kill();
+      clearInterval(checkInterval);
+      clearTimeout(safetyTimeout);
+      clearTimeout(timeoutId);
+      if (timeline) {
+        timeline.kill();
+      }
       ScrollTrigger.getById("work")?.kill();
     };
   }, []);
