@@ -16,15 +16,15 @@ const Contact = () => {
             </p>
             <h4>Phone</h4>
             <p>
-              <a href="tel:+919920782622" data-cursor="disable">
-                +91 91067 44325
+              <a href="tel:+919799971489" data-cursor="disable">
+                +91 97999 71489
               </a>
             </p>
           </div>
           <div className="contact-box">
             <h4>Social</h4>
             <a
-              href="https://github.com/MrShekh"
+              href="https://github.com/ahir-gaurav"
               target="_blank"
               data-cursor="disable"
               className="contact-social"
@@ -32,7 +32,7 @@ const Contact = () => {
               Github <MdArrowOutward />
             </a>
             <a
-              href="https://www.linkedin.com/in/shekh-asif-8b7502306"
+              href="https://www.linkedin.com/in/ahirgaurav/"
               target="_blank"
               data-cursor="disable"
               className="contact-social"
@@ -40,7 +40,7 @@ const Contact = () => {
               Linkedin <MdArrowOutward />
             </a>
             <a
-              href="https://wa.me/9106744325"
+              href="https://wa.me/919799971489"
               target="_blank"
               data-cursor="disable"
               className="contact-social"
@@ -48,7 +48,7 @@ const Contact = () => {
               Whatsapp <MdArrowOutward />
             </a>
             <a
-              href="https://www.instagram.com/shekh_asif_20/"
+              href="https://www.instagram.com/gauravv.yadavv?igsh=MTN1aDVrODFsNXlncg%3D%3D&utm_source=qr"
               target="_blank"
               data-cursor="disable"
               className="contact-social"

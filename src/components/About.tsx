@@ -6,7 +6,7 @@ const About = () => {
       <div className="about-me">
         <h3 className="title">About Me</h3>
         <p className="para">
-          I&apos;m Gaurav Yadav, an AI Engineer &amp; Developer. I build high-quality, custom websites and applications powered by AI for businesses, startups, and individuals.
+          I&apos;m Gaurav Yadav, an aspiring Full Stack Web Developer and Data Analyst passionate about building modern web applications and turning data into meaningful insights. I enjoy solving real-world problems through technology and continuously improving my skills through hands-on projects.
         </p>
       </div>
     </div>
